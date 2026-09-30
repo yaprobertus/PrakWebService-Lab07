@@ -2,9 +2,11 @@
   "name": "praktikum-web-service-week-4",
   "version": "2.0.0",
   "private": true,
-  "description": "GraphQL API Sesi 04-05: Next.js, Apollo Server, Neon, nested resolver, mutation, dan audit N+1.",
+  "description": "GraphQL API Sesi 04-05 dan Lab 07: Next.js, Apollo Server, Neon, OAuth2 GitHub, mutation terlindungi, dan audit N+1.",
   "type": "module",
-  "engines": { "node": ">=20.9" },
+  "engines": {
+    "node": ">=20.9"
+  },
   "scripts": {
     "dev": "next dev",
     "build": "next build",
@@ -21,6 +23,7 @@
     "dataloader": "^2.2.3",
     "dotenv": "^17.2.2",
     "graphql": "^16.11.0",
+    "jsonwebtoken": "^9.0.3",
     "next": "^16.3.5",
     "pg": "^8.16.3",
     "react": "^19.1.1",

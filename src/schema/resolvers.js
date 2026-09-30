@@ -113,7 +113,7 @@ async function deleteOne(context, table, id, label) {
   }
 }
 
-export const resolvers = {
+const baseResolvers = {
   Author: {
     books: async (parent, _args, context) => {
       context.metrics.relationResolverCallCount += 1;
@@ -202,4 +202,22 @@ export const resolvers = {
       updateOne(context, 'books', id, validateBook(input, true), 'Buku'),
     deleteBook: (_p, { id }, context) => deleteOne(context, 'books', id, 'Buku'),
   },
+};
+
+function requireAuthenticatedUser(resolver) {
+  return (parent, args, context, info) => {
+    if (!context?.user) {
+      throw new GraphQLError('Unauthorized: silakan login terlebih dahulu', {
+        extensions: { code: 'UNAUTHENTICATED' },
+      });
+    }
+    return resolver(parent, args, context, info);
+  };
+}
+
+export const resolvers = {
+  ...baseResolvers,
+  Mutation: Object.fromEntries(
+    Object.entries(baseResolvers.Mutation).map(([name, resolver]) => [name, requireAuthenticatedUser(resolver)]),
+  ),
 };

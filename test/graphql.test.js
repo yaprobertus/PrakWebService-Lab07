@@ -2,6 +2,7 @@ import assert from 'node:assert/strict';
 import test from 'node:test';
 import { createApolloServer } from '../src/apollo.js';
 import { createRequestContext } from '../src/context.js';
+import { createAppToken } from '../src/auth.js';
 
 const authors = [
   { id: '1', name: 'Andrea Hirata', country: 'Indonesia' },
@@ -38,10 +39,13 @@ class FakePool {
   }
 }
 
-async function execute(source, { demoNPlusOne = false } = {}) {
+async function execute(source, { demoNPlusOne = false, authorization } = {}) {
   const server = createApolloServer();
   const context = createRequestContext(new FakePool(), {
-    headers: demoNPlusOne ? { 'x-n-plus-one-demo': 'true' } : {},
+    headers: {
+      ...(demoNPlusOne && { 'x-n-plus-one-demo': 'true' }),
+      ...(authorization && { authorization }),
+    },
   });
   const response = await server.executeOperation({ query: source }, { contextValue: context });
   await server.stop();
@@ -78,6 +82,8 @@ test('mode demonstrasi membuktikan rumus 1 + N', async () => {
 });
 
 test('validasi mutation menolak tahun publikasi di luar kontrak', async () => {
+  process.env.JWT_SECRET = 'test-secret-longer-than-thirty-two-characters';
+  const authorization = `Bearer ${createAppToken({ id: 123, login: 'penguji' }, process.env.JWT_SECRET)}`;
   const result = await execute(`
     mutation {
       createBook(input: {
@@ -85,7 +91,7 @@ test('validasi mutation menolak tahun publikasi di luar kontrak', async () => {
         authorId: "1", publisherId: "10"
       }) { id }
     }
-  `);
+  `, { authorization });
   assert.equal(result.errors[0].extensions.code, 'BAD_USER_INPUT');
 });
 

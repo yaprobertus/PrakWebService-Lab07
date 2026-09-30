@@ -63,6 +63,7 @@ class Lab05Pool {
 function context(pool) {
   return {
     pool,
+    user: { id: '123', username: 'penguji' },
     metrics: {
       databaseQueryCount: 0,
       relationResolverCallCount: 0,

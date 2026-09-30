@@ -1,0 +1,17 @@
+# Jalankan dua kali di Apollo Sandbox: tanpa Authorization, lalu dengan Bearer JWT.
+# Sesuaikan variables ISBN, authorId, dan publisherId dengan data nyata.
+mutation CreateBookLab07($isbn: String!, $authorId: ID!, $publisherId: ID!) {
+  createBook(input: {
+    title: "Buku Uji OAuth Lab 07"
+    isbn: $isbn
+    publicationYear: 2026
+    authorId: $authorId
+    publisherId: $publisherId
+  }) {
+    id
+    title
+    isbn
+    author { name }
+    publisher { name }
+  }
+}

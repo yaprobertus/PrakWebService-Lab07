@@ -1,5 +1,6 @@
 import { config } from './config.js';
 import { createLoaders } from './loaders.js';
+import { authenticatedUser } from './auth.js';
 
 export function createRequestContext(pool, request) {
   const demoHeader = request?.headers?.['x-n-plus-one-demo'];
@@ -19,6 +20,7 @@ export function createRequestContext(pool, request) {
   };
   return {
     pool,
+    user: authenticatedUser(request),
     metrics,
     useDataLoader: demoNPlusOne ? false : config.useDataLoader,
     loaders: createLoaders(pool, metrics),

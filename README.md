@@ -1,12 +1,13 @@
-# Praktikum Web Service — GraphQL Sesi 04–05
+# Praktikum Web Service — GraphQL Sesi 04–05 dan OAuth2 Lab 07
 
-Implementasi GraphQL untuk domain perpustakaan kelompok: **authors**, **publishers**, dan **books**. API memakai Apollo Server, Next.js, PostgreSQL/Neon, resolver relasi dua arah, mutation CRUD, DataLoader, dan counter N+1 per request.
+Implementasi GraphQL untuk domain perpustakaan kelompok: **authors**, **publishers**, dan **books**. API memakai Apollo Server, Next.js, PostgreSQL/Neon, resolver relasi dua arah, mutation CRUD, DataLoader, counter N+1 per request, dan login GitHub OAuth2 untuk melindungi mutation.
 
 ## Menjalankan secara lokal
 
 1. Salin `.env.example` menjadi `.env.local`.
 2. Isi `DATABASE_URL` dengan **pooled connection string** Neon (hostname berisi `-pooler`). Jangan commit file environment.
-3. Jalankan:
+3. Untuk Lab 07, daftarkan GitHub OAuth App dan isi `GITHUB_CLIENT_ID`, `GITHUB_CLIENT_SECRET`, `CALLBACK_URL`, serta `JWT_SECRET` di `.env.local`. Callback lokal dapat memakai `http://localhost:3000/auth/callback`; daftarkan URL callback tersebut pada OAuth App jika hendak menguji lokal.
+4. Jalankan:
 
 ```bash
 npm install
@@ -19,6 +20,8 @@ Endpoint lokal:
 - GraphQL: `http://localhost:3000/api/graphql`
 - REST pembanding: `http://localhost:3000/api/books`
 - Health: `http://localhost:3000/api/health`
+- Login GitHub: `http://localhost:3000/auth/login`
+- Callback OAuth: `http://localhost:3000/auth/callback`
 
 ## Query bukti
 
@@ -43,10 +46,14 @@ Jika ada N author, hasilnya `totalDatabaseQueries = 1 + N`. Hapus header untuk m
 1. Hubungkan repository ke project Vercel `praktikumwebserviceweek4`.
 2. Tambahkan `DATABASE_URL` pada Settings → Environment Variables untuk Production, Preview, dan Development. Gunakan versi pooled Neon.
 3. Tambahkan `USE_DATALOADER=true`.
-4. Deploy dan pastikan `/api/health` memberi HTTP 200.
-5. Jalankan nested query melalui Apollo Sandbox pada endpoint production.
+4. Tambahkan `GITHUB_CLIENT_ID`, `GITHUB_CLIENT_SECRET`, `CALLBACK_URL=https://praktikumwebserviceweek4.vercel.app/auth/callback`, dan `JWT_SECRET` (minimal 32 karakter acak) pada Environment Variables Vercel. Daftarkan callback yang **sama persis** pada GitHub OAuth App. Jangan beri prefix `NEXT_PUBLIC_` pada secret.
+5. Deploy dan pastikan `/api/health` memberi HTTP 200.
+6. Buka `/auth/login`, izinkan akses GitHub, salin JWT dari callback, lalu jalankan mutation di Apollo Sandbox dengan header `Authorization: Bearer <JWT>`.
 
 Jangan menaruh connection string Neon di source, screenshot, atau commit Git.
+Jangan menaruh GitHub client secret, JWT secret, GitHub access token, atau JWT utuh di source, screenshot publik, atau commit Git. JWT aplikasi berlaku satu jam; login ulang setelah kedaluwarsa.
+
+Seluruh 9 mutation (buku, penulis, penerbit) membutuhkan JWT valid. Query, introspection, REST GET, dan audit N+1 tetap dapat diakses tanpa login. Panduan uji, screenshot, dan pengumpulan Lab 07 ada di [`docs/LAB07_GUIDE.md`](docs/LAB07_GUIDE.md).
 
 ## Verifikasi
 
